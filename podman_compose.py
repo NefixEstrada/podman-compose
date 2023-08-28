@@ -1000,8 +1000,13 @@ def container_to_args(compose, cnt, detached=True):
         podman_args.append("-i")
     if cnt.get("stop_signal", None):
         podman_args.extend(["--stop-signal", cnt["stop_signal"]])
-    for i in cnt.get("sysctls", []):
-        podman_args.extend(["--sysctl", i])
+    sysctls = cnt.get("sysctls", [])
+    if type(sysctls) is list:
+        for i in sysctls:
+            podman_args.extend(["--sysctl", i])
+    elif type(sysctls) is dict:
+        for i, val in sysctls.items():
+            podman_args.extend(["--sysctl", f"{i}={val}"])
     if cnt.get("tty", None):
         podman_args.append("--tty")
     if cnt.get("privileged", None):
